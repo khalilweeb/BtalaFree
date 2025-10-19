@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-// ========== USER SCHEMA ==========
 const userSchema = new mongoose.Schema(
   {
     
@@ -28,6 +27,7 @@ const userSchema = new mongoose.Schema(
       minlength: [6, "Password must be at least 6 characters long"],
       select: false,
     },
+
 
 
     role: {
@@ -59,6 +59,7 @@ const userSchema = new mongoose.Schema(
         title: String,
         link: String,
         description: String,
+
       },
     ],
     rating: {
@@ -71,6 +72,8 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+
+    
 
     // 🧾 Client
     companyName: {
