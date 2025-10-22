@@ -62,6 +62,12 @@ const userSchema = new mongoose.Schema(
 
       },
     ],
+
+    isPortofolioCompleted : {
+      type : Boolean,
+      default: false
+    }, 
+    
     rating: {
       type: Number,
       min: 0,

@@ -39,6 +39,7 @@ export const signupUser = async (req , res , next) => {
       email,
       password,
       role,
+      isPortofolioCompleted : false
     });
 
 
@@ -55,6 +56,7 @@ export const signupUser = async (req , res , next) => {
         fullName: `${newUser.firstName} ${newUser.lastName}`,
         email: newUser.email,
         role: newUser.role,
+        isPortofolioCompleted : false
       },
     });
 
