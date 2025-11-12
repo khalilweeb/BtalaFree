@@ -2,6 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import userRoutes from './routes/user.js';
+import jobRoutes from "./routes/jobRoutes.js";
+
+
 
 dotenv.config();
 connectDB(); 
@@ -17,6 +20,7 @@ app.use((req , res , next) =>  {
 
 //routes
 app.use('/api/user' , userRoutes);
+app.use('/api/jobs', jobRoutes)
 
 // connect
 const PORT = process.env.PORT || 5000;
