@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import userRoutes from './routes/user.js';
 import jobRoutes from "./routes/jobRoutes.js";
-
+import adminRoutes from "./routes/adminRoutes.js";
 
 
 dotenv.config();
@@ -20,8 +20,8 @@ app.use((req , res , next) =>  {
 
 //routes
 app.use('/api/user' , userRoutes);
-app.use('/api/jobs', jobRoutes)
-
+app.use('/api/jobs', jobRoutes);
+app.use('/api/admin', adminRoutes);
 // connect
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
