@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema(
       select: false,
     },
 
+    //stouche
+    tokens: { type: Number, default: 0 },        // available tokens
+    frozenTokens: { type: Number, default: 0 } ,
+
 
 
     role: {
@@ -41,6 +45,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    
 
    //freelancer
     skills: [
