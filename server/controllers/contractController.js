@@ -25,7 +25,7 @@ export const createContract = async (req, res) => {
       job: jobId,
       freelancer: freelancerId,
       client: req.user._id,
-      etat: "active",
+      etat: "actshive",
     });
 
     res.status(201).json(contract);

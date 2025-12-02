@@ -6,12 +6,14 @@ import jobRoutes from "./routes/jobRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import contractRoutes from "./routes/contractRoutes.js";
 import tokenPackRoutes from "./routes/tokenPackRoutes.js";
+import cors from "cors";
 dotenv.config();
 connectDB(); 
 
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.use((req , res , next) =>  {
     console.log(req.path , req.method);
