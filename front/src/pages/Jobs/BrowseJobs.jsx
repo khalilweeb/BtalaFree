@@ -1,18 +1,20 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { getAllJobs } from "../../api/jobs";
 import Navbar from "../../components/Navbar";
 import "../../assets/styles/jobs.css";
 
 export default function BrowseJobs() {
+  const location = useLocation();
   const [jobs, setJobs] = useState([]);
   const [filteredJobs, setFilteredJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Fetch jobs on mount and when returning to page
   useEffect(() => {
     fetchJobs();
-  }, []);
+  }, [location.pathname]); // Refetch when navigating to this page
 
   const fetchJobs = async () => {
     try {
@@ -58,14 +60,26 @@ export default function BrowseJobs() {
       <Navbar />
       <div className="jobs-container">
         <div className="jobs-header">
-          <h1>Browse Available Jobs</h1>
-          <input
-            type="text"
-            placeholder="Search jobs..."
-            value={searchTerm}
-            onChange={handleSearch}
-            className="search-input"
-          />
+          <div>
+            <h1>Browse Available Jobs</h1>
+            <p className="subtitle">{filteredJobs.length} jobs available</p>
+          </div>
+          <div className="header-actions">
+            <input
+              type="text"
+              placeholder="Search jobs..."
+              value={searchTerm}
+              onChange={handleSearch}
+              className="search-input"
+            />
+            <button 
+              onClick={fetchJobs} 
+              className="btn-refresh"
+              title="Refresh jobs list"
+            >
+              🔄 Refresh
+            </button>
+          </div>
         </div>
 
         <div className="jobs-grid">

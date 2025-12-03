@@ -1,19 +1,34 @@
-# 🚀 BtalaFree - Freelance Marketplace Platform
+# 🚀 BtalaFree - Professional Freelance Marketplace
 
-BtalaFree is a full-stack freelance marketplace platform inspired by Upwork, built with the MERN stack (MongoDB, Express.js, React, Node.js). It connects clients with freelancers, enabling job postings, proposal submissions, contract management, and secure authentication with role-based access control.
+<div align="center">
+
+![BtalaFree](https://img.shields.io/badge/BtalaFree-Freelance%20Platform-blue)
+![MERN Stack](https://img.shields.io/badge/Stack-MERN-green)
+![MongoDB](https://img.shields.io/badge/Database-MongoDB%20Atlas-brightgreen)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
+**A modern, full-featured freelance marketplace built with the MERN stack**
+
+Connect clients with talented freelancers • Manage proposals • Track contracts
+
+[Features](#features) • [Installation](#installation) • [Usage](#usage) • [Demo](#demo-accounts)
+
+</div>
 
 ---
 
 ## 📋 Table of Contents
+
 - [Features](#features)
 - [Tech Stack](#tech-stack)
-- [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
+- [MongoDB Atlas Setup](#mongodb-atlas-setup)
+- [Environment Variables](#environment-variables)
 - [Running the Application](#running-the-application)
+- [Demo Accounts](#demo-accounts)
+- [Project Structure](#project-structure)
 - [API Endpoints](#api-endpoints)
-- [User Roles](#user-roles)
-- [Screenshots](#screenshots)
 - [Contributing](#contributing)
 - [License](#license)
 

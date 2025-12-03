@@ -69,7 +69,13 @@ export default function JobDetails() {
       });
       
       success("Proposal submitted successfully! 🎉");
-      setTimeout(() => navigate("/my-proposals"), 1500);
+      
+      // Refresh job data to show "Already Proposed" status
+      await fetchJobDetails();
+      setShowProposalForm(false);
+      
+      // Navigate after a short delay
+      setTimeout(() => navigate("/my-proposals"), 2000);
     } catch (err) {
       error(err.response?.data?.message || "Failed to submit proposal");
     } finally {
