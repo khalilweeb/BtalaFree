@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getJobById } from "../../api/jobs";
-import { submitProposal, getProposalsByJob } from "../../api/proposals";
+import { submitProposal, getProposalsByJob, acceptProposal, rejectProposal } from "../../api/proposals";
 import { AuthContext } from "../../contexts/AuthContext";
 import Navbar from "../../components/Navbar";
 import "../../assets/styles/jobDetails.css";
@@ -54,6 +54,35 @@ export default function JobDetails() {
       navigate("/my-proposals");
     } catch (error) {
       alert(error.response?.data?.message || "Failed to submit proposal");
+    }
+  };
+
+  const handleAcceptProposal = async (proposalId) => {
+    if (!window.confirm("Are you sure you want to accept this proposal? This will create a contract and mark the job as assigned.")) {
+      return;
+    }
+
+    try {
+      await acceptProposal(proposalId);
+      alert("Proposal accepted! Contract created successfully.");
+      fetchJobDetails(); // Refresh data
+      navigate("/contracts");
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to accept proposal");
+    }
+  };
+
+  const handleRejectProposal = async (proposalId) => {
+    if (!window.confirm("Are you sure you want to reject this proposal?")) {
+      return;
+    }
+
+    try {
+      await rejectProposal(proposalId);
+      alert("Proposal rejected successfully.");
+      fetchJobDetails(); // Refresh data
+    } catch (error) {
+      alert(error.response?.data?.message || "Failed to reject proposal");
     }
   };
 
@@ -175,6 +204,23 @@ export default function JobDetails() {
                       <p><strong>Experience:</strong> {proposal.freelancer.experienceLevel}</p>
                       <p><strong>Skills:</strong> {proposal.freelancer.skills.join(", ")}</p>
                       <p><strong>Rating:</strong> ⭐ {proposal.freelancer.rating}/5</p>
+                      
+                      {proposal.status === "pending" && job.status === "pending" && (
+                        <div className="proposal-actions">
+                          <button
+                            onClick={() => handleAcceptProposal(proposal._id)}
+                            className="btn-accept"
+                          >
+                            ✓ Accept Proposal
+                          </button>
+                          <button
+                            onClick={() => handleRejectProposal(proposal._id)}
+                            className="btn-reject"
+                          >
+                            ✗ Reject
+                          </button>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

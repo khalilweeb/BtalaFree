@@ -15,6 +15,11 @@ export const getProposalsByFreelancer = async (freelancerId) => {
   return response.data;
 };
 
+export const getFreelancerProposals = async (freelancerId) => {
+  const response = await API.get(`/proposals/freelancer/${freelancerId}`);
+  return response.data;
+};
+
 export const acceptProposal = async (proposalId) => {
   const response = await API.put(`/proposals/${proposalId}/accept`);
   return response.data;

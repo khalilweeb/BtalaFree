@@ -14,6 +14,10 @@ import FreelancerDashboard from "../pages/Dashboard/FreelancerDashboard";
 import BrowseJobs from "../pages/Jobs/BrowseJobs";
 import CreateJob from "../pages/Jobs/CreateJob";
 import JobDetails from "../pages/Jobs/JobDetails";
+import MyJobs from "../pages/Jobs/MyJobs";
+
+// Proposal Pages
+import MyProposals from "../pages/Proposals/MyProposals";
 
 // Contract Pages
 import ContractsList from "../pages/Contracts/ContractsList";
@@ -83,6 +87,24 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <JobDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/my-jobs"
+        element={
+          <ProtectedRoute role="client">
+            <MyJobs />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/my-proposals"
+        element={
+          <ProtectedRoute role="freelancer">
+            <MyProposals />
           </ProtectedRoute>
         }
       />

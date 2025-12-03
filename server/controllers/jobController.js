@@ -70,3 +70,16 @@ export const getJobs = async (req, res) => {
       res.status(500).json({ message: error.message });
     }
   };
+
+  // Get jobs by client
+  export const getClientJobs = async (req, res) => {
+    try {
+      const jobs = await Job.find({ client: req.params.clientId })
+        .populate("client", "firstName lastName email companyName")
+        .populate("freelancer", "firstName lastName email rating skills")
+        .sort({ createdAt: -1 });
+      res.status(200).json(jobs);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };

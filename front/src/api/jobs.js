@@ -24,3 +24,8 @@ export const deleteJob = async (id) => {
   const response = await API.delete(`/jobs/${id}`);
   return response.data;
 };
+
+export const getClientJobs = async (clientId) => {
+  const response = await API.get(`/jobs/client/${clientId}`);
+  return response.data;
+};
