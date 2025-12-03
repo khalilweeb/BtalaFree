@@ -118,8 +118,118 @@ export const loginUser = async (req, res) => {
   }
 };
 
+// Get user profile
+export const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select("-password");
+    
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
+    res.status(200).json(user);
+  } catch (error) {
+    console.error("Get profile error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
+// Update user profile
+export const updateUserProfile = async (req, res) => {
+  try {
+    const updates = req.body;
+    
+    // Prevent updating sensitive fields
+    delete updates.password;
+    delete updates.role;
+    delete updates.tokens;
+    delete updates.frozenTokens;
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: updates },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "Profile updated successfully", user });
+  } catch (error) {
+    console.error("Update profile error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get freelancer by ID (public)
+export const getFreelancerById = async (req, res) => {
+  try {
+    const freelancer = await User.findById(req.params.id)
+      .select("-password -tokens -frozenTokens");
+    
+    if (!freelancer || freelancer.role !== "freelancer") {
+      return res.status(404).json({ message: "Freelancer not found" });
+    }
+
+    res.status(200).json(freelancer);
+  } catch (error) {
+    console.error("Get freelancer error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get all freelancers (with filtering)
+export const getFreelancers = async (req, res) => {
+  try {
+    const { skills, experienceLevel } = req.query;
+    let query = { role: "freelancer", isActive: true };
+
+    if (skills) {
+      query.skills = { $in: skills.split(",") };
+    }
+
+    if (experienceLevel) {
+      query.experienceLevel = experienceLevel;
+    }
+
+    const freelancers = await User.find(query)
+      .select("-password -tokens -frozenTokens")
+      .sort({ rating: -1, completedContracts: -1 });
+
+    res.status(200).json(freelancers);
+  } catch (error) {
+    console.error("Get freelancers error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Update freelancer portfolio
+export const updateFreelancerPortfolio = async (req, res) => {
+  try {
+    const { portfolio, skills } = req.body;
+
+    if (req.user.role !== "freelancer") {
+      return res.status(403).json({ message: "Only freelancers can update portfolio" });
+    }
+
+    const updateData = {};
+    if (portfolio) updateData.portfolio = portfolio;
+    if (skills) updateData.skills = skills;
+    updateData.isPortofolioCompleted = true;
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).select("-password");
+
+    res.status(200).json({ message: "Portfolio updated successfully", user });
+  } catch (error) {
+    console.error("Update portfolio error:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 
 
