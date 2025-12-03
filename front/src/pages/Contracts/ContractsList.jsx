@@ -29,7 +29,19 @@ export default function ContractsList() {
     return contract.etat === filter;
   });
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div>
+        <Navbar />
+        <div className="contracts-container">
+          <div className="loading-state">
+            <div className="spinner-large"></div>
+            <p>Loading your contracts...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

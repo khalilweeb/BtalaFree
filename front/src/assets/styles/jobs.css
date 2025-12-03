@@ -94,6 +94,52 @@
   opacity: 0.9;
 }
 
+/* Job Card Title Row */
+.job-card-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.job-card-title-row h2 {
+  flex: 1;
+  margin: 0;
+}
+
+/* Proposed Badge */
+.proposed-badge {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.5);
+  }
+}
+
+/* Proposed Button Style */
+.btn-proposed {
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+  cursor: pointer;
+}
+
+.btn-proposed:hover {
+  opacity: 0.9;
+}
+
 /* New Styles for My Jobs and My Proposals */
 
 .subtitle {

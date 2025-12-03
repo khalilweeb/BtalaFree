@@ -31,6 +31,22 @@ const proposalSchema = new mongoose.Schema(
       min: 0,
     },
 
+    estimatedDuration: {
+      type: String,
+      trim: true,
+    },
+
+    skills: {
+      type: [String],
+      default: [],
+    },
+
+    proposedRating: {
+      type: Number,
+      min: 0,
+      max: 5,
+    },
+
     status: {
       type: String,
       enum: ["pending", "accepted", "rejected"],

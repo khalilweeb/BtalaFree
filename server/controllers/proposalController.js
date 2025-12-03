@@ -5,7 +5,7 @@ import Job from "../models/Job.js";
 // Freelancer submits a proposal
 export const submitProposal = async (req, res) => {
   try {
-    const { job, coverLetter, proposedAmount } = req.body;
+    const { job, coverLetter, proposedAmount, estimatedDuration, skills, proposedRating } = req.body;
     const freelancerId = req.user._id;
 
     // Get job to find client
@@ -26,6 +26,9 @@ export const submitProposal = async (req, res) => {
       client: jobData.client,
       coverLetter,
       proposedAmount,
+      estimatedDuration,
+      skills,
+      proposedRating,
       status: "pending"
     });
 

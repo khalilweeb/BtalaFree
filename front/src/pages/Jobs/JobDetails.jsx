@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { getJobById } from "../../api/jobs";
 import { submitProposal, getProposalsByJob, acceptProposal, rejectProposal } from "../../api/proposals";
 import { AuthContext } from "../../contexts/AuthContext";
@@ -24,6 +24,8 @@ export default function JobDetails() {
     coverLetter: "",
     proposedAmount: "",
     estimatedDuration: "",
+    skills: user?.skills?.join(", ") || "",
+    proposedRating: user?.rating || "",
   });
 
   useEffect(() => {
@@ -62,6 +64,8 @@ export default function JobDetails() {
         coverLetter: proposalData.coverLetter,
         proposedAmount: parseFloat(proposalData.proposedAmount),
         estimatedDuration: proposalData.estimatedDuration || "Not specified",
+        skills: proposalData.skills ? proposalData.skills.split(",").map(s => s.trim()) : [],
+        proposedRating: proposalData.proposedRating ? parseFloat(proposalData.proposedRating) : null,
       });
       
       success("Proposal submitted successfully! 🎉");
@@ -114,8 +118,37 @@ export default function JobDetails() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (!job) return <div>Job not found</div>;
+  if (loading) {
+    return (
+      <div>
+        <Navbar />
+        <div className="job-details-container">
+          <div className="loading-state">
+            <div className="spinner-large"></div>
+            <p>Loading job details...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!job) {
+    return (
+      <div>
+        <Navbar />
+        <div className="job-details-container">
+          <div className="empty-state-card">
+            <div className="empty-icon">❌</div>
+            <h3>Job Not Found</h3>
+            <p>This job may have been removed or doesn't exist.</p>
+            <Link to="/jobs" className="btn-primary">
+              Browse Jobs
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const isClient = user.role === "client";
   const isFreelancer = user.role === "freelancer";
@@ -157,7 +190,21 @@ export default function JobDetails() {
 
           {isFreelancer && job.status === "pending" && (
             <div className="proposal-section">
-              {!showProposalForm ? (
+              {job.hasProposed ? (
+                <div className="already-proposed-card">
+                  <div className="proposed-icon">✓</div>
+                  <h3>You Already Submitted a Proposal</h3>
+                  <p className="proposal-status-text">
+                    Status: <span className={`status-badge status-${job.proposalStatus}`}>
+                      {job.proposalStatus}
+                    </span>
+                  </p>
+                  <p>You can view your proposal details in "My Proposals" page.</p>
+                  <Link to="/my-proposals" className="btn-secondary">
+                    View My Proposals
+                  </Link>
+                </div>
+              ) : !showProposalForm ? (
                 <div>
                   <div className="freelancer-info-card">
                     <h3>Your Profile</h3>
@@ -210,6 +257,34 @@ export default function JobDetails() {
                         setProposalData({ ...proposalData, estimatedDuration: e.target.value })
                       }
                       placeholder="How long will this take?"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Your Skills * (comma-separated)</label>
+                    <input
+                      type="text"
+                      value={proposalData.skills}
+                      onChange={(e) =>
+                        setProposalData({ ...proposalData, skills: e.target.value })
+                      }
+                      placeholder="e.g., React, Node.js, MongoDB"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Your Rating (0-5)</label>
+                    <input
+                      type="number"
+                      value={proposalData.proposedRating}
+                      onChange={(e) =>
+                        setProposalData({ ...proposalData, proposedRating: e.target.value })
+                      }
+                      min="0"
+                      max="5"
+                      step="0.1"
+                      placeholder="Your current rating"
                     />
                   </div>
 

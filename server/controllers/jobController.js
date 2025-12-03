@@ -1,4 +1,5 @@
 import Job from "../models/Job.js";
+import Proposal from "../models/Proposel.js";
 
 
 
@@ -28,6 +29,25 @@ export const createJob = async (req, res) => {
 export const getJobs = async (req, res) => {
     try {
       const jobs = await Job.find().populate("client freelancer", "lastName email");
+      
+      // If user is authenticated and is a freelancer, check which jobs they've proposed to
+      if (req.user && req.user.role === "freelancer") {
+        const freelancerId = req.user._id;
+        
+        // Get all proposals by this freelancer
+        const proposals = await Proposal.find({ freelancer: freelancerId }).select("job");
+        const proposedJobIds = proposals.map(p => p.job.toString());
+        
+        // Add hasProposed flag to each job
+        const jobsWithProposalStatus = jobs.map(job => {
+          const jobObj = job.toObject();
+          jobObj.hasProposed = proposedJobIds.includes(job._id.toString());
+          return jobObj;
+        });
+        
+        return res.status(200).json(jobsWithProposalStatus);
+      }
+      
       res.status(200).json(jobs);
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -39,12 +59,26 @@ export const getJobs = async (req, res) => {
     try {
       const job = await Job.findById(req.params.id).populate("client freelancer", "name email");
       if (!job) return res.status(404).json({ message: "Job not found" });
+      
+      // If user is authenticated and is a freelancer, check if they've proposed
+      if (req.user && req.user.role === "freelancer") {
+        const existingProposal = await Proposal.findOne({ 
+          job: req.params.id, 
+          freelancer: req.user._id 
+        });
+        
+        const jobObj = job.toObject();
+        jobObj.hasProposed = !!existingProposal;
+        jobObj.proposalStatus = existingProposal ? existingProposal.status : null;
+        
+        return res.status(200).json(jobObj);
+      }
+      
       res.status(200).json(job);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
   };
-
 
   //update 
   export const updateJob = async (req, res) => {

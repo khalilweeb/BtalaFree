@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { getContractById, completeContract, cancelContract } from "../../api/contracts";
 import { AuthContext } from "../../contexts/AuthContext";
 import Navbar from "../../components/Navbar";
@@ -62,8 +62,37 @@ export default function ContractDetails() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (!contract) return <div>Contract not found</div>;
+  if (loading) {
+    return (
+      <div>
+        <Navbar />
+        <div className="contract-details-container">
+          <div className="loading-state">
+            <div className="spinner-large"></div>
+            <p>Loading contract details...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!contract) {
+    return (
+      <div>
+        <Navbar />
+        <div className="contract-details-container">
+          <div className="empty-state-card">
+            <div className="empty-icon">❌</div>
+            <h3>Contract Not Found</h3>
+            <p>This contract may have been removed or doesn't exist.</p>
+            <Link to="/contracts" className="btn-primary">
+              View All Contracts
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const isClient = contract.client._id === user.id;
   const isFreelancer = contract.freelancer._id === user.id;

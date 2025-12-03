@@ -71,7 +71,14 @@ export default function BrowseJobs() {
         <div className="jobs-grid">
           {filteredJobs.map((job) => (
             <div key={job._id} className="job-card-full">
-              <h2>{job.jobTitle}</h2>
+              <div className="job-card-title-row">
+                <h2>{job.jobTitle}</h2>
+                {job.hasProposed && (
+                  <span className="proposed-badge">
+                    ✓ Already Proposed
+                  </span>
+                )}
+              </div>
               <p className="job-description">{job.description}</p>
               
               <div className="job-details">
@@ -88,8 +95,8 @@ export default function BrowseJobs() {
                 )}
               </div>
 
-              <Link to={`/jobs/${job._id}`} className="btn-apply">
-                View Details & Apply
+              <Link to={`/jobs/${job._id}`} className={`btn-apply ${job.hasProposed ? 'btn-proposed' : ''}`}>
+                {job.hasProposed ? '✓ View Your Proposal' : 'View Details & Apply'}
               </Link>
             </div>
           ))}
