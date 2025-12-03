@@ -39,7 +39,19 @@ export default function BrowseJobs() {
     setFilteredJobs(filtered);
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) {
+    return (
+      <div>
+        <Navbar />
+        <div className="jobs-container">
+          <div className="loading-state">
+            <div className="spinner-large"></div>
+            <p>Loading available jobs...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -84,7 +96,15 @@ export default function BrowseJobs() {
         </div>
 
         {filteredJobs.length === 0 && (
-          <p className="empty-state">No jobs found matching your search</p>
+          <div className="empty-state-card">
+            <div className="empty-icon">🔍</div>
+            <h3>No Jobs Found</h3>
+            <p>
+              {searchTerm 
+                ? `No jobs match your search for "${searchTerm}"`
+                : "No available jobs at the moment. Check back soon!"}
+            </p>
+          </div>
         )}
       </div>
     </div>

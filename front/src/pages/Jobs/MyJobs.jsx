@@ -18,10 +18,12 @@ export default function MyJobs() {
   const fetchMyJobs = async () => {
     try {
       setLoading(true);
-      const data = await getClientJobs(user._id);
-      setJobs(data);
+      const data = await getClientJobs(user.id || user._id);
+      console.log("Fetched jobs:", data);
+      setJobs(data || []);
     } catch (error) {
       console.error("Error fetching jobs:", error);
+      setJobs([]);
     } finally {
       setLoading(false);
     }

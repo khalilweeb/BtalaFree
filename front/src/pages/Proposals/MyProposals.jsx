@@ -18,10 +18,12 @@ export default function MyProposals() {
   const fetchMyProposals = async () => {
     try {
       setLoading(true);
-      const data = await getFreelancerProposals(user._id);
-      setProposals(data);
+      const data = await getFreelancerProposals(user.id || user._id);
+      console.log("Fetched proposals:", data);
+      setProposals(data || []);
     } catch (error) {
       console.error("Error fetching proposals:", error);
+      setProposals([]);
     } finally {
       setLoading(false);
     }

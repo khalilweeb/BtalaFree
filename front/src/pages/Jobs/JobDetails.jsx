@@ -4,19 +4,26 @@ import { getJobById } from "../../api/jobs";
 import { submitProposal, getProposalsByJob, acceptProposal, rejectProposal } from "../../api/proposals";
 import { AuthContext } from "../../contexts/AuthContext";
 import Navbar from "../../components/Navbar";
+import Toast from "../../components/Toast";
+import ConfirmModal from "../../components/ConfirmModal";
+import useToast from "../../hooks/useToast";
 import "../../assets/styles/jobDetails.css";
 
 export default function JobDetails() {
   const { id } = useParams();
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { toasts, success, error, removeToast } = useToast();
   const [job, setJob] = useState(null);
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [showProposalForm, setShowProposalForm] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, type: '', proposalId: null });
   const [proposalData, setProposalData] = useState({
     coverLetter: "",
     proposedAmount: "",
+    estimatedDuration: "",
   });
 
   useEffect(() => {
@@ -43,46 +50,67 @@ export default function JobDetails() {
   const handleProposalSubmit = async (e) => {
     e.preventDefault();
     
+    if (!proposalData.coverLetter || !proposalData.proposedAmount) {
+      error("Please fill in all required fields");
+      return;
+    }
+    
+    setSubmitting(true);
     try {
       await submitProposal({
         job: id,
-        ...proposalData,
+        coverLetter: proposalData.coverLetter,
         proposedAmount: parseFloat(proposalData.proposedAmount),
+        estimatedDuration: proposalData.estimatedDuration || "Not specified",
       });
       
-      alert("Proposal submitted successfully!");
-      navigate("/my-proposals");
-    } catch (error) {
-      alert(error.response?.data?.message || "Failed to submit proposal");
+      success("Proposal submitted successfully! 🎉");
+      setTimeout(() => navigate("/my-proposals"), 1500);
+    } catch (err) {
+      error(err.response?.data?.message || "Failed to submit proposal");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleAcceptProposal = async (proposalId) => {
-    if (!window.confirm("Are you sure you want to accept this proposal? This will create a contract and mark the job as assigned.")) {
-      return;
-    }
+    setConfirmModal({ 
+      isOpen: true, 
+      type: 'accept', 
+      proposalId,
+      title: 'Accept Proposal?',
+      message: 'This will create a contract and mark the job as assigned. Other proposals will be automatically rejected.'
+    });
+  };
 
+  const confirmAcceptProposal = async () => {
     try {
-      await acceptProposal(proposalId);
-      alert("Proposal accepted! Contract created successfully.");
-      fetchJobDetails(); // Refresh data
-      navigate("/contracts");
-    } catch (error) {
-      alert(error.response?.data?.message || "Failed to accept proposal");
+      await acceptProposal(confirmModal.proposalId);
+      success("Proposal accepted! Contract created successfully. 🎉");
+      await fetchJobDetails();
+      setTimeout(() => navigate("/contracts"), 1500);
+    } catch (err) {
+      error(err.response?.data?.message || "Failed to accept proposal");
     }
   };
 
   const handleRejectProposal = async (proposalId) => {
-    if (!window.confirm("Are you sure you want to reject this proposal?")) {
-      return;
-    }
+    setConfirmModal({ 
+      isOpen: true, 
+      type: 'reject', 
+      proposalId,
+      title: 'Reject Proposal?',
+      message: 'Are you sure you want to reject this proposal? This action cannot be undone.'
+    });
+  };
 
+  const confirmRejectProposal = async () => {
     try {
-      await rejectProposal(proposalId);
-      alert("Proposal rejected successfully.");
-      fetchJobDetails(); // Refresh data
-    } catch (error) {
-      alert(error.response?.data?.message || "Failed to reject proposal");
+      await rejectProposal(confirmModal.proposalId);
+      success("Proposal rejected successfully.");
+      await fetchJobDetails();
+    } catch (err) {
+      error(err.response?.data?.message || "Failed to reject proposal");
     }
   };
 
@@ -130,12 +158,31 @@ export default function JobDetails() {
           {isFreelancer && job.status === "pending" && (
             <div className="proposal-section">
               {!showProposalForm ? (
-                <button
-                  onClick={() => setShowProposalForm(true)}
-                  className="btn-submit-proposal"
-                >
-                  Submit Proposal
-                </button>
+                <div>
+                  <div className="freelancer-info-card">
+                    <h3>Your Profile</h3>
+                    <div className="profile-stats">
+                      <div className="profile-stat">
+                        <span className="stat-label">Rating:</span>
+                        <span className="stat-value">⭐ {user.rating || 'N/A'}/5</span>
+                      </div>
+                      <div className="profile-stat">
+                        <span className="stat-label">Experience:</span>
+                        <span className="stat-value">{user.experienceLevel || 'Not set'}</span>
+                      </div>
+                      <div className="profile-stat">
+                        <span className="stat-label">Skills:</span>
+                        <span className="stat-value">{user.skills?.length || 0} skills</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setShowProposalForm(true)}
+                    className="btn-submit-proposal"
+                  >
+                    Submit Proposal
+                  </button>
+                </div>
               ) : (
                 <form onSubmit={handleProposalSubmit} className="proposal-form">
                   <h3>Submit Your Proposal</h3>
@@ -155,7 +202,19 @@ export default function JobDetails() {
                   </div>
 
                   <div className="form-group">
-                    <label>Cover Letter</label>
+                    <label>Estimated Duration (e.g., 2 weeks, 1 month)</label>
+                    <input
+                      type="text"
+                      value={proposalData.estimatedDuration}
+                      onChange={(e) =>
+                        setProposalData({ ...proposalData, estimatedDuration: e.target.value })
+                      }
+                      placeholder="How long will this take?"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Cover Letter *</label>
                     <textarea
                       value={proposalData.coverLetter}
                       onChange={(e) =>
@@ -168,8 +227,8 @@ export default function JobDetails() {
                   </div>
 
                   <div className="form-actions">
-                    <button type="submit" className="btn-primary">
-                      Submit Proposal
+                    <button type="submit" className="btn-primary" disabled={submitting}>
+                      {submitting ? "Submitting..." : "Submit Proposal"}
                     </button>
                     <button
                       type="button"
@@ -231,6 +290,29 @@ export default function JobDetails() {
           )}
         </div>
       </div>
+      
+      {/* Toast Notifications */}
+      <div className="toast-container">
+        {toasts.map((toast) => (
+          <Toast
+            key={toast.id}
+            message={toast.message}
+            type={toast.type}
+            onClose={() => removeToast(toast.id)}
+          />
+        ))}
+      </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmModal
+        isOpen={confirmModal.isOpen}
+        onClose={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+        onConfirm={confirmModal.type === 'accept' ? confirmAcceptProposal : confirmRejectProposal}
+        title={confirmModal.title}
+        message={confirmModal.message}
+        confirmText={confirmModal.type === 'accept' ? 'Accept' : 'Reject'}
+        type={confirmModal.type === 'accept' ? 'success' : 'danger'}
+      />
     </div>
   );
 }

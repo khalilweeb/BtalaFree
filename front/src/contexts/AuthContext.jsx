@@ -13,13 +13,20 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(() => localStorage.getItem("token") || null);
 
   const login = (userData, token) => {
-    setUser(userData);
+    // Normalize user data - ensure both id and _id exist
+    const normalizedUser = {
+      ...userData,
+      id: userData.id || userData._id,
+      _id: userData._id || userData.id
+    };
+    
+    setUser(normalizedUser);
     setToken(token);
-    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("user", JSON.stringify(normalizedUser));
     localStorage.setItem("token", token);
 
     // Redirect based on role
-    if (userData.role === "admin") navigate("/admin/dashboard");
+    if (normalizedUser.role === "admin") navigate("/admin/dashboard");
     else navigate("/dashboard");
   };
 
